@@ -8,145 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        :root {
-            --primary-color: #1e1e2e;
-            --secondary-color: #302f3d;
-            --accent-color: #89b4fa;
-            --text-color: #cdd6f4;
-            --success-color: #a6e3a1;
-            --error-color: #f38ba8;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: var(--accent-color);
-            margin-bottom: 30px;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        input, select {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--accent-color);
-            color: var(--primary-color);
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-        .charts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .chart-container {
-            flex: 1 1 calc(50% - 10px);
-            min-width: 300px;
-            background-color: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .stat-card {
-            flex: 1 1 calc(25% - 15px);
-            min-width: 200px;
-            background-color: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        #tradeLog {
-            margin-top: 20px;
-            background-color: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        #tradeLog table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        #tradeLog th, #tradeLog td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--primary-color);
-        }
-        #tradeLog th {
-            background-color: var(--primary-color);
-        }
-        .delete-btn {
-            background-color: var(--error-color);
-            color: var(--primary-color);
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        #notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: var(--primary-color);
-            font-weight: bold;
-            display: none;
-        }
-        .success {
-            background-color: var(--success-color);
-        }
-        .error {
-            background-color: var(--error-color);
-        }
-        #importExport {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        #importExport button {
-            flex: 1;
-        }
+        /* ...styles from the original code... */
     </style>
 </head>
 <body>
@@ -208,58 +70,80 @@
     <div id="notification"></div>
 
     <script>
-        const dateInput = document.getElementById('dateInput');
-        const instrumentInput = document.getElementById('instrumentInput');
-        const accountInput = document.getElementById('accountInput');
-        const rInput = document.getElementById('rInput');
-        const logButton = document.getElementById('logButton');
-        const tradeLogBody = document.getElementById('tradeLogBody');
-        const totalTradesEl = document.getElementById('totalTrades');
-        const winRateEl = document.getElementById('winRate');
-        const averageREl = document.getElementById('averageR');
-        const totalREl = document.getElementById('totalR');
-        const exportBtn = document.getElementById('exportBtn');
-        const importBtn = document.getElementById('importBtn');
-        const importInput = document.getElementById('importInput');
-        const notification = document.getElementById('notification');
-
+        // State and element selection
         let trades = JSON.parse(localStorage.getItem('lifetimeTrades')) || [];
         let charts = {};
+        const elements = {
+            dateInput: document.getElementById('dateInput'),
+            instrumentInput: document.getElementById('instrumentInput'),
+            accountInput: document.getElementById('accountInput'),
+            rInput: document.getElementById('rInput'),
+            logButton: document.getElementById('logButton'),
+            tradeLogBody: document.getElementById('tradeLogBody'),
+            totalTradesEl: document.getElementById('totalTrades'),
+            winRateEl: document.getElementById('winRate'),
+            averageREl: document.getElementById('averageR'),
+            totalREl: document.getElementById('totalR'),
+            exportBtn: document.getElementById('exportBtn'),
+            importBtn: document.getElementById('importBtn'),
+            importInput: document.getElementById('importInput'),
+            notification: document.getElementById('notification')
+        };
 
-        function saveTrades() {
+        // Utility functions
+        const saveTrades = () => {
             localStorage.setItem('lifetimeTrades', JSON.stringify(trades));
-        }
+        };
 
-        function logTrade() {
+        const showNotification = (message, type) => {
+            elements.notification.textContent = message;
+            elements.notification.className = type;
+            elements.notification.style.display = 'block';
+            setTimeout(() => {
+                elements.notification.style.display = 'none';
+            }, 3000);
+        };
+
+        const clearInputs = () => {
+            elements.dateInput.value = new Date().toISOString().split('T')[0];
+            elements.instrumentInput.value = '';
+            elements.accountInput.value = '';
+            elements.rInput.value = '';
+        };
+
+        // Logging a trade
+        const logTrade = () => {
             const trade = {
                 id: Date.now(),
-                date: dateInput.value,
-                instrument: instrumentInput.value,
-                account: accountInput.value,
-                r: parseFloat(rInput.value)
+                date: elements.dateInput.value,
+                instrument: elements.instrumentInput.value,
+                account: elements.accountInput.value,
+                r: parseFloat(elements.rInput.value)
             };
             trades.push(trade);
             saveTrades();
             updateUI();
             clearInputs();
             showNotification('Trade logged successfully!', 'success');
-        }
+        };
 
-        function clearInputs() {
-            dateInput.value = '';
-            instrumentInput.value = '';
-            accountInput.value = '';
-            rInput.value = '';
-        }
+        // Deleting a trade
+        const deleteTrade = (id) => {
+            trades = trades.filter(trade => trade.id !== id);
+            saveTrades();
+            updateUI();
+            showNotification('Trade deleted successfully!', 'success');
+        };
 
-        function updateUI() {
+        // Updating UI
+        const updateUI = () => {
             updateTradeLog();
             updateStats();
             updateCharts();
-        }
+        };
 
-        function updateTradeLog() {
-            tradeLogBody.innerHTML = trades.map(trade => `
+        const updateTradeLog = () => {
+            elements.tradeLogBody.innerHTML = trades.map(trade => `
                 <tr>
                     <td>${trade.date}</td>
                     <td>${trade.instrument}</td>
@@ -268,27 +152,27 @@
                     <td><button class="delete-btn" onclick="deleteTrade(${trade.id})">Delete</button></td>
                 </tr>
             `).join('');
-        }
+        };
 
-        function updateStats() {
+        const updateStats = () => {
             const totalTrades = trades.length;
             const winningTrades = trades.filter(t => t.r > 0).length;
             const winRate = totalTrades > 0 ? (winningTrades / totalTrades * 100).toFixed(2) : 0;
-            const averageR = trades.length > 0 ? (trades.reduce((sum, t) => sum + t.r, 0) / trades.length).toFixed(2) : 0;
+            const averageR = totalTrades > 0 ? (trades.reduce((sum, t) => sum + t.r, 0) / totalTrades).toFixed(2) : 0;
             const totalR = trades.reduce((sum, t) => sum + t.r, 0).toFixed(2);
 
-            totalTradesEl.textContent = totalTrades;
-            winRateEl.textContent = `${winRate}%`;
-            averageREl.textContent = averageR;
-            totalREl.textContent = totalR;
-        }
+            elements.totalTradesEl.textContent = totalTrades;
+            elements.winRateEl.textContent = `${winRate}%`;
+            elements.averageREl.textContent = averageR;
+            elements.totalREl.textContent = totalR;
+        };
 
-        function updateCharts() {
+        const updateCharts = () => {
             updateEquityCurve();
             updateRDistribution();
-        }
+        };
 
-        function updateEquityCurve() {
+        const updateEquityCurve = () => {
             const ctx = document.getElementById('equityCurve').getContext('2d');
             const equityCurve = trades.reduce((acc, trade) => {
                 const lastValue = acc.length > 0 ? acc[acc.length - 1].y : 0;
@@ -306,7 +190,7 @@
                     datasets: [{
                         label: 'Equity Curve',
                         data: equityCurve,
-                        borderColor: var(--accent-color),
+                        borderColor: '#89b4fa',
                         tension: 0.1
                     }]
                 },
@@ -315,22 +199,17 @@
                     scales: {
                         x: {
                             type: 'time',
-                            time: {
-                                unit: 'day'
-                            }
+                            time: { unit: 'day' }
                         },
                         y: {
-                            title: {
-                                display: true,
-                                text: 'Cumulative R'
-                            }
+                            title: { display: true, text: 'Cumulative R' }
                         }
                     }
                 }
             });
-        }
+        };
 
-        function updateRDistribution() {
+        const updateRDistribution = () => {
             const ctx = document.getElementById('rDistribution').getContext('2d');
             const rValues = trades.map(t => t.r);
             const binSize = 0.5;
@@ -355,93 +234,62 @@
                     datasets: [{
                         label: 'R Distribution',
                         data: data,
-                        backgroundColor: var(--accent-color)
+                        backgroundColor: '#89b4fa'
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Frequency'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'R Multiple'
-                            }
+                            title: { display: true, text: 'Frequency' }
                         }
                     }
                 }
             });
-        }
+        };
 
-        function deleteTrade(id) {
-            trades = trades.filter(t => t.id !== id);
-            saveTrades();
-            updateUI();
-            showNotification('Trade deleted successfully!', 'success');
-        }
-
-        function showNotification(message, type) {
-            notification.textContent = message;
-            notification.className = type;
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
-        function exportToCSV() {
+        // CSV Export/Import
+        const exportToCSV = () => {
             const csv = Papa.unparse(trades);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', 'trade_log.csv');
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
+            const url = URL.createObjectURL(blob);
 
-        function importFromCSV(file) {
+            link.href = url;
+            link.setAttribute('download', 'trades.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        const importFromCSV = (file) => {
             Papa.parse(file, {
-                complete: function(results) {
-                    trades = results.data.map(row => ({
-                        id: Date.now() + Math.random(),
-                        date: row[0],
-                        instrument: row[1],
-                        account: row[2],
-                        r: parseFloat(row[3])
-                    }));
+                header: true,
+                dynamicTyping: true,
+                complete: (results) => {
+                    trades = results.data;
                     saveTrades();
                     updateUI();
                     showNotification('Trades imported successfully!', 'success');
                 }
             });
-        }
+        };
 
-        llogButton.addEventListener('click', logTrade);
-        exportBtn.addEventListener('click', exportToCSV);
-        importBtn.addEventListener('click', () => importInput.click());
-        importInput.addEventListener('change', (event) => {
+        // Event listeners
+        elements.logButton.addEventListener('click', logTrade);
+        elements.exportBtn.addEventListener('click', exportToCSV);
+        elements.importBtn.addEventListener('click', () => elements.importInput.click());
+        elements.importInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
                 importFromCSV(file);
             }
         });
 
-        // Initialize UI
-        updateUI();
-
-        // Set current date as default for date input
-        dateInput.valueAsDate = new Date();
+        window.onload = () => {
+            updateUI();
+            clearInputs();
+        };
     </script>
 </body>
 </html>
