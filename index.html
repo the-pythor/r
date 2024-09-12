@@ -194,7 +194,62 @@
     <div id="notification"></div>
 
     <script>
-        // Same JavaScript as before, no changes.
-    </script>
-</body>
-</html>
+        const tradeLog = [];
+        const ctxEquity = document.getElementById('equityCurve').getContext('2d');
+        const ctxRDistribution = document.getElementById('rDistribution').getContext('2d');
+        let equityChart, rDistributionChart;
+
+        function updateStats() {
+            const totalTrades = tradeLog.length;
+            const totalR = tradeLog.reduce((acc, trade) => acc + parseFloat(trade.r), 0).toFixed(2);
+            const winRate = (tradeLog.filter(trade => trade.r > 0).length / totalTrades * 100).toFixed(2);
+            const averageR = (totalTrades > 0 ? (totalR / totalTrades).toFixed(2) : 0);
+
+            document.getElementById('totalTrades').textContent = totalTrades;
+            document.getElementById('totalR').textContent = totalR;
+            document.getElementById('winRate').textContent = totalTrades > 0 ? `${winRate}%` : '0%';
+            document.getElementById('averageR').textContent = averageR;
+
+            updateEquityCurve();
+            updateRDistribution();
+        }
+
+        function updateEquityCurve() {
+            const equityData = tradeLog.map(trade => trade.r).reduce((acc, curr) => {
+                const last = acc.length > 0 ? acc[acc.length - 1] : 0;
+                acc.push(last + parseFloat(curr));
+                return acc;
+            }, []);
+
+            const labels = tradeLog.map((_, idx) => idx + 1);
+            if (equityChart) equityChart.destroy();
+            equityChart = new Chart(ctxEquity, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Equity Curve',
+                        data: equityData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
+                    }]
+                }
+            });
+        }
+
+        function updateRDistribution() {
+            const distribution = tradeLog.reduce((acc, trade) => {
+                acc[trade.r] = acc[trade.r] ? acc[trade.r] + 1 : 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(distribution);
+            const data = Object.values(distribution);
+            if (rDistributionChart) rDistributionChart.destroy();
+            rDistributionChart = new Chart(ctxRDistribution, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'R Distribution',
+                       
