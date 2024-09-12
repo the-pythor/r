@@ -252,4 +252,63 @@
                     labels: labels,
                     datasets: [{
                         label: 'R Distribution',
-                       
+                        data: data,
+                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
+
+        document.getElementById('logButton').addEventListener('click', () => {
+            const date = document.getElementById('dateInput').value;
+            const instrument = document.getElementById('instrumentInput').value;
+            const account = document.getElementById('accountInput').value;
+            const r = document.getElementById('rInput').value;
+
+            if (!date || !instrument || !account || !r) {
+                showNotification('Please fill all fields!', 'error');
+                return;
+            }
+
+            tradeLog.push({ date, instrument, account, r });
+            addTradeToLog(date, instrument, account, r);
+            updateStats();
+            showNotification('Trade logged successfully!', 'success');
+            clearInputs();
+        });
+
+        function addTradeToLog(date, instrument, account, r) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${date}</td><td>${instrument}</td><td>${account}</td><td>${r}</td>
+                             <td><button class="delete-btn">Delete</button></td>`;
+            document.getElementById('tradeLogBody').appendChild(row);
+
+            row.querySelector('.delete-btn').addEventListener('click', () => {
+                const idx = Array.from(row.parentNode.children).indexOf(row);
+                tradeLog.splice(idx, 1);
+                row.remove();
+                updateStats();
+            });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = type;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function clearInputs() {
+            document.getElementById('dateInput').value = '';
+            document.getElementById('instrumentInput').value = '';
+            document.getElementById('accountInput').value = '';
+            document.getElementById('rInput').value = '';
+        }
+    </script>
+</body>
+</html>
